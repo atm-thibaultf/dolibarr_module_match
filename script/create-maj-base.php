@@ -28,11 +28,11 @@ if(!defined('INC_FROM_DOLIBARR')) {
 }
 
 
-/* uncomment
-
-
 dol_include_once('/match/class/match.class.php');
+dol_include_once('/match/class/dict_discipline.class.php');
 
-$o=new match($db);
+$o=new Match($db);
 $o->init_db_by_vars();
-*/
+
+$o=new DictDiscipline($db);
+$o->init_db_by_vars();

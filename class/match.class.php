@@ -25,7 +25,7 @@ if (!class_exists('SeedObject'))
 }
 
 
-class match extends SeedObject
+class Match extends SeedObject
 {
     /**
      * Canceled status
@@ -40,13 +40,9 @@ class match extends SeedObject
 	 */
 	const STATUS_VALIDATED = 1;
 	/**
-	 * Refused status
-	 */
-	const STATUS_REFUSED = 3;
-	/**
 	 * Accepted status
 	 */
-	const STATUS_ACCEPTED = 4;
+	const STATUS_FINISHED = 2;
 
 	/** @var array $TStatus Array of translate key for each const */
 	public static $TStatus = array(
@@ -54,7 +50,7 @@ class match extends SeedObject
 		,self::STATUS_DRAFT => 'matchStatusShortDraft'
 		,self::STATUS_VALIDATED => 'matchStatusShortValidated'
 //		,self::STATUS_REFUSED => 'matchStatusShortRefused'
-//		,self::STATUS_ACCEPTED => 'matchStatusShortAccepted'
+//		,self::STATUS_FINISHED => 'matchStatusShortAccepted'
 	);
 
 	/** @var string $table_element Table name in SQL */
@@ -96,7 +92,7 @@ class match extends SeedObject
             'length' => 50,
             'label' => 'Ref',
             'enabled' => 1,
-            'visible' => 1,
+            'visible' => 5,
             'notnull' => 1,
             'showoncombobox' => 1,
             'index' => 1,
@@ -115,6 +111,28 @@ class match extends SeedObject
             'index' => 1,
             'position' => 20
         ),
+        
+        'fk_discipline' => array(
+            'type' => 'integer:DictDiscipline:match/class/dict_discipline.class.php',
+            'label' => 'Discipline',
+            'enabled' => 1,
+            'visible' => 1,
+            'notnull' => 1,
+            'default' => 0,
+            'index' => 1,
+            'position' => 25,
+        ),
+        
+        'date' => array(
+            'type' => 'date',
+            'label' => 'Date',
+            'enabled' => 1,
+            'visible' => 1,
+            'notnull' => 1,
+            'default' => 0,
+            'index' => 1,
+            'position' => 30,
+        ),
 
         'status' => array(
             'type' => 'integer',
@@ -124,62 +142,70 @@ class match extends SeedObject
             'notnull' => 1,
             'default' => 0,
             'index' => 1,
-            'position' => 30,
+            'position' => 40,
             'arrayofkeyval' => array(
                 0 => 'Draft',
                 1 => 'Active',
-                -1 => 'Canceled'
+                -1 => 'Canceled',
+                2 => 'Finished'
             )
         ),
-
-        'label' => array(
-            'type' => 'varchar(255)',
-            'label' => 'Label',
+        
+        'team_1' => array(
+            'type' => 'chkbxlst:user:login:rowid::active=1',
+            'label' => 'Joueur de l\'équipe 1',
             'enabled' => 1,
             'visible' => 1,
-            'position' => 40,
-            'searchall' => 1,
-            'css' => 'minwidth200',
-            'help' => 'Help text',
-            'showoncombobox' => 1
-        ),
-
-        'fk_soc' => array(
-            'type' => 'integer:Societe:societe/class/societe.class.php',
-            'label' => 'ThirdParty',
-            'visible' => 1,
-            'enabled' => 1,
-            'position' => 50,
+            'notnull' => 1,
+            'default' => 0,
             'index' => 1,
-            'help' => 'LinkToThirparty'
+            'position' => 50,
         ),
-
-        'description' => array(
-            'type' => 'text', // or html for WYSWYG
-            'label' => 'Description',
+        
+        'team_2' => array(
+            'type' => 'chkbxlst:user:login:rowid::active=1',
+            'label' => 'Joueur de l\'équipe 2',
             'enabled' => 1,
-            'visible' => -1, //  un bug sur la version 9.0 de Dolibarr necessite de mettre -1 pour ne pas apparaitre sur les listes au lieu de la valeur 3
-            'position' => 60
+            'visible' => 1,
+            'notnull' => 1,
+            'default' => 0,
+            'index' => 1,
+            'position' => 60,
         ),
-
-//        'fk_user_valid' =>array(
-//            'type' => 'integer',
-//            'label' => 'UserValidation',
-//            'enabled' => 1,
-//            'visible' => -1,
-//            'position' => 512
-//        ),
-
-        'import_key' => array(
-            'type' => 'varchar(14)',
-            'label' => 'ImportId',
+        
+        'score_1' => array(
+            'type' => 'integer',
+            'label' => 'Score équipe 1',
             'enabled' => 1,
-            'visible' => -2,
-            'notnull' => -1,
-            'index' => 0,
-            'position' => 1000
+            'visible' => 1,
+            'default' => 0,
+            'notnull' => 0,
+            'index' => 1,
+            'position' => 70
         ),
-
+        
+        'score_2' => array(
+            'type' => 'integer',
+            'label' => 'Score équipe 2',
+            'enabled' => 1,
+            'visible' => 1,
+            'default' => 0,
+            'notnull' => 0,
+            'index' => 1,
+            'position' => 70
+        ),
+        
+        'winner' => array(
+            'type' => 'chkbxlst:user:login:rowid::active=1',
+            'label' => 'Gagnants',
+            'enabled' => 1,
+            'visible' => 1,
+            'notnull' => 1,
+            'default' => 0,
+            'index' => 1,
+            'position' => 80,
+        ),
+      
     );
 
     /** @var string $ref Object reference */
@@ -327,7 +353,7 @@ class match extends SeedObject
     {
         if ($this->status === self::STATUS_VALIDATED)
         {
-            $this->status = self::STATUS_ACCEPTED;
+            $this->status = self::STATUS_FINISHED;
             $this->withChild = false;
 
             return $this->update($user);
@@ -359,7 +385,7 @@ class match extends SeedObject
      */
     public function setReopen($user)
     {
-        if ($this->status === self::STATUS_ACCEPTED || $this->status === self::STATUS_REFUSED)
+        if ($this->status === self::STATUS_FINISHED || $this->status === self::STATUS_REFUSED)
         {
             $this->status = self::STATUS_VALIDATED;
             $this->withChild = false;
@@ -443,7 +469,7 @@ class match extends SeedObject
         elseif ($status==self::STATUS_DRAFT) { $statusType='status0'; $statusLabel=$langs->trans('matchStatusDraft'); $statusLabelShort=$langs->trans('matchStatusShortDraft'); }
         elseif ($status==self::STATUS_VALIDATED) { $statusType='status1'; $statusLabel=$langs->trans('matchStatusValidated'); $statusLabelShort=$langs->trans('matchStatusShortValidate'); }
         elseif ($status==self::STATUS_REFUSED) { $statusType='status5'; $statusLabel=$langs->trans('matchStatusRefused'); $statusLabelShort=$langs->trans('matchStatusShortRefused'); }
-        elseif ($status==self::STATUS_ACCEPTED) { $statusType='status6'; $statusLabel=$langs->trans('matchStatusAccepted'); $statusLabelShort=$langs->trans('matchStatusShortAccepted'); }
+        elseif ($status==self::STATUS_FINISHED) { $statusType='status6'; $statusLabel=$langs->trans('matchStatusAccepted'); $statusLabelShort=$langs->trans('matchStatusShortAccepted'); }
 
         if (function_exists('dolGetStatus'))
         {

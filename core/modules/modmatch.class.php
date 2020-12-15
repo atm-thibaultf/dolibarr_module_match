@@ -57,7 +57,7 @@ class modmatch extends DolibarrModules
 		// Module label (no space allowed), used if translation string 'ModuleXXXName' not found (where XXX is value of numeric property 'numero' of module)
 		$this->name = preg_replace('/^mod/i', '', get_class($this));
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
-		$this->description = "Description of module match";
+		$this->description = "Module de gestion de matchs sportifs";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
 		$this->version = '1.0.0';
 		// Key used in llx_const table to save module status enabled/disabled (where MATCH is value of property name of module in uppercase)
@@ -84,11 +84,17 @@ class modmatch extends DolibarrModules
 		//							'models' => 0,                                   	// Set this to 1 if module has its own models directory (core/modules/xxx)
 		//							'css' => array('/match/css/match.css.php'),	// Set this to relative path of css file if module has its own css file
 	 	//							'js' => array('/match/js/match.js'),          // Set this to relative path of js file if module must load a js on all pages
-		//							'hooks' => array('hookcontext1','hookcontext2')  	// Set here all hooks context managed by module
+		//							'hooks' => array('hookcontext1','hookcontext2'),  	// Set here all hooks context managed by module
 		//							'dir' => array('output' => 'othermodulename'),      // To force the default directories names
 		//							'workflow' => array('WORKFLOW_MODULE1_YOURACTIONTYPE_MODULE2'=>array('enabled'=>'! empty($conf->module1->enabled) && ! empty($conf->module2->enabled)', 'picto'=>'yourpicto@match')) // Set here all workflow context managed by module
 		//                        );
-		$this->module_parts = array();
+		
+		$this->module_parts = array(
+		                        	'triggers' => 1,                                 	// Set this to 1 if module has its own trigger directory (core/triggers)
+									'css' => array('/match/css/match.css.php'),	// Set this to relative path of css file if module has its own css file
+									'js' => array('/match/js/match.js'),          // Set this to relative path of js file if module must load a js on all pages
+									'hooks' => array('hookcontext1','hookcontext2'),  	// Set here all hooks context managed by module
+									);
 
 		// Data directories to create when module is enabled.
 		// Example: this->dirs = array("/match/temp");
@@ -146,21 +152,21 @@ class modmatch extends DolibarrModules
         	$conf->match->enabled=0;
         }
 		$this->dictionaries=array();
-        /* Example:
+        
         if (! isset($conf->match->enabled)) $conf->match->enabled=0;	// This is to avoid warnings
         $this->dictionaries=array(
             'langs'=>'match@match',
-            'tabname'=>array(MAIN_DB_PREFIX."table1",MAIN_DB_PREFIX."table2",MAIN_DB_PREFIX."table3"),		// List of tables we want to see into dictonnary editor
-            'tablib'=>array("Table1","Table2","Table3"),													// Label of tables
-            'tabsql'=>array('SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table1 as f','SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table2 as f','SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table3 as f'),	// Request to select fields
-            'tabsqlsort'=>array("label ASC","label ASC","label ASC"),																					// Sort order
-            'tabfield'=>array("code,label","code,label","code,label"),																					// List of fields (result of select to show dictionary)
-            'tabfieldvalue'=>array("code,label","code,label","code,label"),																				// List of fields (list of fields to edit a record)
-            'tabfieldinsert'=>array("code,label","code,label","code,label"),																			// List of fields (list of fields for insert)
-            'tabrowid'=>array("rowid","rowid","rowid"),																									// Name of columns with primary key (try to always name it 'rowid')
-            'tabcond'=>array($conf->match->enabled,$conf->match->enabled,$conf->match->enabled)												// Condition to show each dictionary
+            'tabname'=>array(MAIN_DB_PREFIX."c_discipline"),		// List of tables we want to see into dictonnary editor
+            'tablib'=>array("Disciplines"),													// Label of tables
+            'tabsql'=>array('SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'c_discipline as f'),	// Request to select fields
+            'tabsqlsort'=>array("label ASC"),																					// Sort order
+            'tabfield'=>array("code,label"),																					// List of fields (result of select to show dictionary)
+            'tabfieldvalue'=>array("code,label"),																				// List of fields (list of fields to edit a record)
+            'tabfieldinsert'=>array("code,label"),																			// List of fields (list of fields for insert)
+            'tabrowid'=>array("rowid"),																									// Name of columns with primary key (try to always name it 'rowid')
+            'tabcond'=>array($conf->match->enabled)												// Condition to show each dictionary
         );
-        */
+        
 
         // Boxes
 		// Add here list of php file(s) stored in core/boxes that contains class to show a box.
@@ -180,28 +186,27 @@ class modmatch extends DolibarrModules
 		// $this->rights[$r][4] = 'level1';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		// $this->rights[$r][5] = 'level2';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		// $r++;
-/*
+
 		$this->rights[$r][0] = $this->numero . $r;	// Permission id (must not be already used)
-		$this->rights[$r][1] = 'match_read';	// Permission label
+		$this->rights[$r][1] = 'Consulter les matchs';	// Permission label
 		$this->rights[$r][3] = 1; 					// Permission by default for new user (0/1)
 		$this->rights[$r][4] = 'read';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$r++;
 		
 		$this->rights[$r][0] = $this->numero . $r;	// Permission id (must not be already used)
-		$this->rights[$r][1] = 'match_write';	// Permission label
+		$this->rights[$r][1] = 'Créer/modifier les matchs';	// Permission label
 		$this->rights[$r][3] = 1; 					// Permission by default for new user (0/1)
 		$this->rights[$r][4] = 'write';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$r++;
 
 		$this->rights[$r][0] = $this->numero . $r;	// Permission id (must not be already used)
-		$this->rights[$r][1] = 'match_delete';	// Permission label
+		$this->rights[$r][1] = 'Supprimer les matchs';	// Permission label
 		$this->rights[$r][3] = 1; 					// Permission by default for new user (0/1)
 		$this->rights[$r][4] = 'delete';		    // In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
 		$r++;
-*/
 
 		// Main menu entries
 		$this->menu = array();			// List of menus to add
@@ -238,8 +243,10 @@ class modmatch extends DolibarrModules
 		//							'target'=>'',
 		//							'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
 		// $r++;
-		
-/*
+
+
+		// Example to declare a new Top Menu entry and its Left menu entry:
+		//Menu supérieur
 		$this->menu[$r]=array(
 			'fk_menu'=>0,			                // Put 0 if this is a top menu
 			'type'=>'top',			                // This is a Top menu entry
@@ -256,6 +263,7 @@ class modmatch extends DolibarrModules
 		);
 		$r++;
 
+		//Menu secondaire, entré menu principale
 		$this->menu[$r]=array(
 			'fk_menu'=>'fk_mainmenu=match',			                // Put 0 if this is a top menu
 			'type'=>'left',			                // This is a Top menu entry
@@ -272,6 +280,7 @@ class modmatch extends DolibarrModules
 		);
 		$r++;
 
+		//Menu secondaire, sous menu
 		$this->menu[$r]=array(
 			'fk_menu'=>'fk_mainmenu=match,fk_leftmenu=match_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
@@ -288,7 +297,7 @@ class modmatch extends DolibarrModules
 		);				                // 0=Menu for internal users, 1=external users, 2=both
 		$r++;
 
-
+		//Menu secondaire, sous menu
 		$this->menu[$r]=array(
 			'fk_menu'=>'fk_mainmenu=match,fk_leftmenu=match_left',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 			'type'=>'left',			                // This is a Left menu entry
@@ -304,7 +313,7 @@ class modmatch extends DolibarrModules
 			'user'=>0
 		);				                // 0=Menu for internal users, 1=external users, 2=both
 		$r++;
-*/
+
 		
 		// Exports
 		$r=1;
@@ -339,8 +348,17 @@ class modmatch extends DolibarrModules
 		define('INC_FROM_DOLIBARR', true);
 
 		require dol_buildpath('/match/script/create-maj-base.php');
+		require_once(DOL_DOCUMENT_ROOT .'/core/class/extrafields.class.php');
 
 		$result=$this->_load_tables('/match/sql/');
+		
+		
+		$extrafield = new ExtraFields($this->db);
+		$extrafield->addExtraField('nb_match', 'Nombre de matchs', 'int', '100', '10', 'user', 0, 0, '', array('options'=> array('' => null)), 1, '','1', null, '', '', '', 1, 0, '');
+		$extrafield->addExtraField('nb_win', 'Nombre de matchs gagnés', 'int', '100', '10', 'user', 0, 0, '', array('options'=> array('' => null)), 1, '','1', null, '', '', '', 1, 0, '');
+		$extrafield->addExtraField('nb_loose', 'Nombre de matchs perdus', 'int', '100', '10', 'user', 0, 0, '', array('options'=> array('' => null)), 1, '','1', null, '', '', '', 1, 0, '');
+		$extrafield->addExtraField('nb_goal', 'Nombre de buts marqués', 'int', '100', '10', 'user', 0, 0, '', array('options'=> array('' => null)), 1, '','1', null, '', '', '', 1, 0, '');
+		$extrafield->addExtraField('ratio_win_loose', 'Ratio', 'double', '100', '24,8', 'user', 0, 0, '', array('options'=> array('' => null)), 1, '','1', null, '', '', '', 1, 0, '');
 
 		return $this->_init($sql, $options);
 	}
