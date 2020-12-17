@@ -6,7 +6,7 @@ ATMAbout = Ce module a été développé par <a href="http://www.atm-consulting.
 matchSetup = Configuration du module match
 matchAbout = A propos du module match
 
-match=match
+match=Match
 AbricotNeedUpdate=Le module abricot doit être mis à jour
 LinkToThirparty=Lien vers le tiers
 
@@ -20,39 +20,58 @@ TopMenumatch=Match
 LeftMenumatchCreate=Nouveau match
 LeftMenumatchList=Liste des matchs
 
-
 # STATUS
 matchStatusCanceled=Abandonnée (fermée)
 matchStatusDraft=Brouillon (à valider)
 matchStatusValidated=Validée (à accepter)
 matchStatusRefused=Refusée (fermée)
-matchStatusAccepted=Acceptée (fermée)
+matchStatusAccepted=Terminé (fermée)
 
 matchStatusShortCanceled=Abandonnée
 matchStatusShortDraft=Brouillon
 matchStatusShortValidated=Validée
 matchStatusShortRefused=Refusée
-matchStatusShortAccepted=Acceptée
+matchStatusShortAccepted=Terminé
 
 # LIST
 matchList=Liste match
 Nomatch=(vide)
+DateCre=Date de création
+DateMaj=Date de mise à jour
 
 # CARD
 Newmatch=Création match
 matchCard=Fiche match
+discipline=Discipline
+date=Date
+playerTeam1=Joueur de l'équipe 1
+playerTeam2=Joueur de l'équipe 2
+scoreTeam1=Score de l'équipe 1
+scoreTeam2=Score de l'équipe 2
+winner_1=Gagnant 1
+winner_2=Gagnant 2
+looser_1=Perdant 1
+looser_2=Perdant 2
+matchDescription=Description
 
+matchCreate=Créer
 matchModify=Modifier
 matchClone=Cloner
 matchValid=Valider
-matchAccept=Accepter
+matchAccept=Terminer
 matchRefuse=Refuser
 matchReopen=Rouvrir
 matchCancel=Abandonner
 matchDelete=Supprimer
 
-ConfirmValidatematchTitle=Confirmation d'activation
-ConfirmValidatematchBody=Souhaitez-vous vraiment activer cette fiche match %s ?
+ConfirmValidatematchTitle=Confirmation de validation
+ConfirmValidatematchBody=Souhaitez-vous vraiment valider cette fiche match %s ?
 
 ConfirmDeletematchTitle=Confirmation de suppression
 ConfirmDeletematchBody=Souhaitez-vous vraiment supprimer cette fiche match %s ?
+
+ConfirmReopenmatchBody=Êtes-vous sur de vouloir revenir au status validé ?
+ConfirmReopenmatchTitle=Revenir au status validé
+
+miss_required_field=Un champ obligatoire n'est pas renseigné.
+match_equality=Il ne peut pas y avoir match nul !

@@ -124,6 +124,7 @@ if (empty($reshook))
                 header('Location: '.dol_buildpath('/match/card.php', 1).'?id='.$object->id);
                 exit;
             }
+            break;
         case 'update_extras':
 
             $object->oldcopy = dol_clone($object);
@@ -155,9 +156,9 @@ if (empty($reshook))
 			header('Location: '.dol_buildpath('/match/card.php', 1).'?id='.$object->id);
 			exit;
 
-		case 'modif':
-		case 'reopen':
-			if (!empty($user->rights->match->write)) $object->setDraft($user);
+        case 'modif':
+		case 'confirm_reopen':
+			if (!empty($user->rights->match->write)) $object->setReopen($user);
 
 			break;
 		case 'confirm_validate':
@@ -176,8 +177,12 @@ if (empty($reshook))
 		case 'dellink':
 			$object->deleteObjectLinked(null, '', null, '', GETPOST('dellinkid'));
 			header('Location: '.dol_buildpath('/match/card.php', 1).'?id='.$object->id);
-			exit;
-
+            exit;
+            
+        case 'accept' :
+            if (!empty($user->rights->match->write)) $res=$object->setAccepted($user);
+            header('Location: '.dol_buildpath('/match/card.php', 1).'?id='.$object->id);
+            exit;
 	}
 }
 
@@ -204,7 +209,7 @@ if ($action == 'create')
     print '<table class="border centpercent">'."\n";
 
     // Common attributes
-    include './tpl/match_add.tpl.php';
+    include DOL_DOCUMENT_ROOT . '/core/tpl/commonfields_add.tpl.php';
 
     // Other attributes
     include DOL_DOCUMENT_ROOT . '/core/tpl/extrafields_add.tpl.php';
@@ -214,14 +219,14 @@ if ($action == 'create')
     dol_fiche_end();
 
     print '<div class="center">';
-    print '<input type="submit" class="button" name="add" value="'.dol_escape_htmltag($langs->trans('Create')).'">';
+    print '<input type="submit" class="button" name="add" value="'.dol_escape_htmltag($langs->trans('matchCreate')).'">';
     print '&nbsp; ';
     print '<input type="'.($backtopage?"submit":"button").'" class="button" name="cancel" value="'.dol_escape_htmltag($langs->trans('Cancel')).'"'.($backtopage?'':' onclick="javascript:history.go(-1)"').'>';	// Cancel for create does not post form if we don't know the backtopage
     print '</div>';
 
     print '</form>';
 }
-else
+else 
 {
     if (empty($object->id))
     {
@@ -322,9 +327,9 @@ else
                     if ($object->status !== match::STATUS_CANCELED)
                     {
                         // Modify
-                        if ($object->status !== match::STATUS_ACCEPTED) print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=edit">'.$langs->trans("matchModify").'</a></div>'."\n";
+                        if ($object->status !== match::STATUS_FINISHED) print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=edit">'.$langs->trans("matchModify").'</a></div>'."\n";
                         // Clone
-                        print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=clone">'.$langs->trans("matchClone").'</a></div>'."\n";
+                        // print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=clone">'.$langs->trans("matchClone").'</a></div>'."\n";
                     }
 
                     // Valid
@@ -333,22 +338,22 @@ else
                     // Accept
                     if ($object->status === match::STATUS_VALIDATED) print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=accept">'.$langs->trans('matchAccept').'</a></div>'."\n";
                     // Refuse
-                    if ($object->status === match::STATUS_VALIDATED) print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=refuse">'.$langs->trans('matchRefuse').'</a></div>'."\n";
+                    // if ($object->status === match::STATUS_VALIDATED) print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=refuse">'.$langs->trans('matchRefuse').'</a></div>'."\n";
 
 
                     // Reopen
-                    if ($object->status === match::STATUS_ACCEPTED || $object->status === match::STATUS_REFUSED) print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=reopen">'.$langs->trans('matchReopen').'</a></div>'."\n";
+                    if ($object->status === match::STATUS_FINISHED) print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=reopen">'.$langs->trans('matchReopen').'</a></div>'."\n";
                     // Cancel
-                    if ($object->status === match::STATUS_VALIDATED) print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=cancel">'.$langs->trans("matchCancel").'</a></div>'."\n";
+                    // if ($object->status === match::STATUS_VALIDATED) print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=cancel">'.$langs->trans("matchCancel").'</a></div>'."\n";
                 }
                 else
                 {
                     if ($object->status !== match::STATUS_CANCELED)
                     {
                         // Modify
-                        if ($object->status !== match::STATUS_ACCEPTED) print '<div class="inline-block divButAction"><a class="butActionRefused" href="#" title="'.dol_escape_htmltag($langs->trans("NotEnoughPermissions")).'">'.$langs->trans("matchModify").'</a></div>'."\n";
+                        if ($object->status !== match::STATUS_FINISHED) print '<div class="inline-block divButAction"><a class="butActionRefused" href="#" title="'.dol_escape_htmltag($langs->trans("NotEnoughPermissions")).'">'.$langs->trans("matchModify").'</a></div>'."\n";
                         // Clone
-                        print '<div class="inline-block divButAction"><a class="butAction" href="#" title="'.dol_escape_htmltag($langs->trans("NotEnoughPermissions")).'">'.$langs->trans("matchClone").'</a></div>'."\n";
+                        // print '<div class="inline-block divButAction"><a class="butAction" href="#" title="'.dol_escape_htmltag($langs->trans("NotEnoughPermissions")).'">'.$langs->trans("matchClone").'</a></div>'."\n";
                     }
 
                     // Valid
@@ -357,12 +362,12 @@ else
                     // Accept
                     if ($object->status === match::STATUS_VALIDATED) print '<div class="inline-block divButAction"><a class="butActionRefused" href="#">'.$langs->trans('matchAccept').'</a></div>'."\n";
                     // Refuse
-                    if ($object->status === match::STATUS_VALIDATED) print '<div class="inline-block divButAction"><a class="butActionRefused" href="#">'.$langs->trans('matchRefuse').'</a></div>'."\n";
+                    // if ($object->status === match::STATUS_VALIDATED) print '<div class="inline-block divButAction"><a class="butActionRefused" href="#">'.$langs->trans('matchRefuse').'</a></div>'."\n";
 
                     // Reopen
-                    if ($object->status === match::STATUS_ACCEPTED || $object->status === match::STATUS_REFUSED) print '<div class="inline-block divButAction"><a class="butActionRefused" href="#" title="'.dol_escape_htmltag($langs->trans("NotEnoughPermissions")).'">'.$langs->trans('matchReopen').'</a></div>'."\n";
+                    if ($object->status === match::STATUS_FINISHED) print '<div class="inline-block divButAction"><a class="butActionRefused" href="#" title="'.dol_escape_htmltag($langs->trans("NotEnoughPermissions")).'">'.$langs->trans('matchReopen').'</a></div>'."\n";
                     // Cancel
-                    if ($object->status === match::STATUS_VALIDATED) print '<div class="inline-block divButAction"><a class="butActionRefused" href="#" title="'.dol_escape_htmltag($langs->trans("NotEnoughPermissions")).'">'.$langs->trans("matchCancel").'</a></div>'."\n";
+                    // if ($object->status === match::STATUS_VALIDATED) print '<div class="inline-block divButAction"><a class="butActionRefused" href="#" title="'.dol_escape_htmltag($langs->trans("NotEnoughPermissions")).'">'.$langs->trans("matchCancel").'</a></div>'."\n";
                 }
 
                 if (!empty($user->rights->match->delete))

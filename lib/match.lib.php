@@ -115,7 +115,7 @@ function getFormConfirmmatch($form, $object, $action)
     elseif ($action === 'reopen' && !empty($user->rights->match->write))
     {
         $body = $langs->trans('ConfirmReopenmatchBody', $object->ref);
-        $formconfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ConfirmReopenmatchTitle'), $body, 'confirm_refuse', '', 0, 1);
+        $formconfirm = $form->formconfirm($_SERVER['PHP_SELF'] . '?id=' . $object->id, $langs->trans('ConfirmReopenmatchTitle'), $body, 'confirm_reopen', '', 0, 1);
     }
     elseif ($action === 'delete' && !empty($user->rights->match->write))
     {

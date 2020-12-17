@@ -358,8 +358,8 @@ class modmatch extends DolibarrModules
 		$extrafield->addExtraField('nb_win', 'Nombre de matchs gagnés', 'int', '100', '10', 'user', 0, 0, '', array('options'=> array('' => null)), 1, '','1', null, '', '', '', 1, 0, '');
 		$extrafield->addExtraField('nb_loose', 'Nombre de matchs perdus', 'int', '100', '10', 'user', 0, 0, '', array('options'=> array('' => null)), 1, '','1', null, '', '', '', 1, 0, '');
 		$extrafield->addExtraField('nb_goal', 'Nombre de buts marqués', 'int', '100', '10', 'user', 0, 0, '', array('options'=> array('' => null)), 1, '','1', null, '', '', '', 1, 0, '');
-		$extrafield->addExtraField('ratio_win_loose', 'Ratio', 'double', '100', '24,8', 'user', 0, 0, '', array('options'=> array('' => null)), 1, '','1', null, '', '', '', 1, 0, '');
-
+		$extrafield->addExtraField('ratio_win_loose', 'Ratio', 'double', '100', '24,2', 'user', 0, 0, '', array('options'=> array('' => null)), 1, '','1', null, '', '', '', 1, 0, '');
+		
 		return $this->_init($sql, $options);
 	}
 
