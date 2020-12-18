@@ -523,6 +523,9 @@ class Match extends SeedObject
             //ajout nbre de match gagnés
             ${'win_' . $i}->array_options["options_nb_win"]++;
 
+            //ajout nbre de match perdus
+            ${'loose_' . $i}->array_options["options_nb_loose"]++;
+
             //ajout des points winners + loosers
             ${'win_' . $i}->array_options["options_nb_goal"] = ${'win_' . $i}->array_options["options_nb_goal"] + $score_win;
             ${'loose_' . $i}->array_options["options_nb_goal"] = ${'loose_' . $i}->array_options["options_nb_goal"] + $score_loose;
@@ -555,13 +558,27 @@ class Match extends SeedObject
             //ajout nbre de match gagnés
             ${'win_' . $i}->array_options["options_nb_win"]--;
 
+            //ajout nbre de match gagnés
+            ${'loose_' . $i}->array_options["options_nb_loose"]--;
+
             //ajout des points winners + loosers
             ${'win_' . $i}->array_options["options_nb_goal"] = ${'win_' . $i}->array_options["options_nb_goal"] - $score_win;
             ${'loose_' . $i}->array_options["options_nb_goal"] = ${'loose_' . $i}->array_options["options_nb_goal"] - $score_loose;
 
             //calcul des ratios
-            ${'win_' . $i}->array_options["options_ratio_win_loose"] = ${'win_' . $i}->array_options["options_nb_win"] / ${'win_' . $i}->array_options["options_nb_match"] * 100;
-            ${'loose_' . $i}->array_options["options_ratio_win_loose"] = ${'loose_' . $i}->array_options["options_nb_win"] / ${'loose_' . $i}->array_options["options_nb_match"] * 100;
+            if (empty(${'win_' . $i}->array_options["options_nb_match"])) 
+            {
+                ${'win_' . $i}->array_options["options_ratio_win_loose"] = 0;
+            } else {
+                ${'win_' . $i}->array_options["options_ratio_win_loose"] = ${'win_' . $i}->array_options["options_nb_win"] / ${'win_' . $i}->array_options["options_nb_match"] * 100;
+            }
+            
+            if (empty(${'loose_' . $i}->array_options["options_nb_match"]))
+            {
+                ${'loose_' . $i}->array_options["options_ratio_win_loose"] = 0;
+            } else {
+                ${'loose_' . $i}->array_options["options_ratio_win_loose"] = ${'loose_' . $i}->array_options["options_nb_win"] / ${'loose_' . $i}->array_options["options_nb_match"] * 100;
+            }
 
             ${'win_' . $i}->update($user);
             ${'loose_' . $i}->update($user);

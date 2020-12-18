@@ -65,30 +65,59 @@ class Actionsmatch
 	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
 	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	public function doActions($parameters, &$object, &$action, $hookmanager)
+	public function getNomUrl($parameters, &$object, &$action, $hookmanager)
 	{
 		$error = 0; // Error counter
-		$myvalue = 'test'; // A result value
+		$myvalue = ''; // A result value
 
-		print_r($parameters);
-		echo "action: " . $action;
-		print_r($object);
-
-		if (in_array('somecontext', explode(':', $parameters['context'])))
+		if (in_array('userdao', explode(':', $parameters['context'])))
 		{
-		  // do something only for the context 'somecontext'
+			dol_include_once('match/lib/match.lib.php');
+
+			$object->fetch_optionals();
+			$rank = getRank($object->array_options['options_ratio_win_loose']);
+			if ($object->array_options['options_nb_match'] < 10)
+			{
+				$myvalue = '<img style="width:25px;vertical-align:middle;" src="' . dol_buildpath('/match/img/Rank_' . $rank . '.png', 1) . '"/>';
+			}
 		}
 
 		if (! $error)
 		{
 			$this->results = array('myreturn' => $myvalue);
-			$this->resprints = 'A text to show';
+			$this->resprints = $myvalue;
 			return 0; // or return 1 to replace standard code
 		}
 		else
 		{
 			$this->errors[] = 'Error message';
 			return -1;
+		}
+	}
+
+	public function addMoreActionsButtons($parameters, &$object, &$action) 
+	{
+		if (in_array('usercard', explode(':', $parameters['context'])))
+		{
+			dol_include_once('match/lib/match.lib.php');
+
+			$object->fetch_optionals();
+			$rank = getRank($object->array_options['options_ratio_win_loose']);
+			if ($object->array_options['options_nb_match'] < 10)
+			{
+				print '<img style="width:50px;vertical-align:middle;" id="rank_picto" src="' . dol_buildpath('/match/img/Rank_' . $rank . '.png', 1) . '"/>';
+?>
+				<script type="text/javascript">
+
+				$(document).ready(function () 
+				{
+					$divFilter = $('#rank_picto');
+					$('.statusref').prepend($divFilter);
+				});
+				</script>
+
+<?php
+			}
 		}
 	}
 }

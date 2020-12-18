@@ -135,3 +135,29 @@ function getFormConfirmmatch($form, $object, $action)
 
     return $formconfirm;
 }
+
+/**
+ * @param integer   $ratio     ratio_win_loose
+ * @return integer      
+ */
+function getRank($ratio)
+{
+    if ($ratio >= 0 && $ratio < 29)
+    {
+        return 1;
+    } else if ($ratio >= 30 && $ratio < 39) {
+        return 2;
+    } else if ($ratio >= 40 && $ratio < 49) {
+        return 3;
+    } else if ($ratio >= 50 && $ratio < 59) {
+        return 4;
+    } else if ($ratio >= 60 && $ratio < 69) {
+        return 5;
+    } else if ($ratio >= 70 && $ratio < 79) {
+        return 6;
+    } else if ($ratio >= 80 && $ratio < 89) {
+        return 7;
+    } else if ($ratio >= 90 && $ratio < 101) {
+        return 8;
+    } 
+}

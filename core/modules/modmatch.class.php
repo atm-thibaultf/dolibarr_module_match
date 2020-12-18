@@ -91,9 +91,9 @@ class modmatch extends DolibarrModules
 		
 		$this->module_parts = array(
 		                        	'triggers' => 1,                                 	// Set this to 1 if module has its own trigger directory (core/triggers)
-									'css' => array('/match/css/match.css.php'),	// Set this to relative path of css file if module has its own css file
-									'js' => array('/match/js/match.js'),          // Set this to relative path of js file if module must load a js on all pages
-									'hooks' => array('hookcontext1','hookcontext2'),  	// Set here all hooks context managed by module
+									//'css' => array('/match/css/match.css.php'),	// Set this to relative path of css file if module has its own css file
+									//'js' => array('/match/js/match.js'),          // Set this to relative path of js file if module must load a js on all pages
+									'hooks' => array('userdao', 'usercard'),  	// Set here all hooks context managed by module
 									);
 
 		// Data directories to create when module is enabled.

@@ -17,6 +17,7 @@
 
 require 'config.php';
 dol_include_once('match/class/match.class.php');
+dol_include_once('core/class/html.form.class.php');
 
 if(empty($user->rights->match->read)) accessforbidden();
 
@@ -37,6 +38,13 @@ $fk_discipline = GETPOST($inputPrefix . 'fk_discipline');
 $score_1 = GETPOST($inputPrefix . 'score_1');
 $score_2 = GETPOST($inputPrefix . 'score_2');
 
+if (empty(GETPOST('button_removefilter_x', 'alpha')))
+{
+	$player_all = GETPOST('player_all', 'int');
+	$player_win = GETPOST('player_win', 'int');
+	$player_loose = GETPOST('player_loose', 'int');
+} 
+
 $hookmanager->initHooks(array('matchlist'));
 
 if ($object->isextrafieldmanaged)
@@ -56,6 +64,7 @@ if ($operator_score_2 !== '<' && $operator_score_2 !== '>')
 {
 	$operator_score_2 = '';
 }
+
 
 /*
  * Actions
@@ -118,6 +127,27 @@ if ($fk_discipline > 0)
 	$sql .= ' AND t.fk_discipline = ' . $fk_discipline;
 }
 
+if (!empty($player_all) && $player_all != -1)
+{
+	$sql .= ' AND (t.fk_user_1_1 = ' . $player_all;
+	$sql .= ' OR t.fk_user_1_2 = ' . $player_all;
+	$sql .= ' OR t.fk_user_2_1 = ' . $player_all;
+	$sql .= ' OR t.fk_user_2_2 = ' . $player_all . ')';
+}
+
+if (!empty($player_win) && $player_win != -1)
+{
+	$sql .= ' AND (t.winner_1 = ' . $player_win;
+	$sql .= ' OR t.winner_2 = ' . $player_win . ')';
+}
+
+if (!empty($player_loose) && $player_loose != -1)
+{
+	$sql .= ' AND (t.looser_1 = ' . $player_loose;
+	$sql .= ' OR t.looser_2 = ' . $player_loose . ')';
+}
+
+
 //$sql.= ' AND t.entity IN ('.getEntity('match', 1).')';
 //if ($type == 'mine') $sql.= ' AND t.fk_user = '.$user->id;
 
@@ -128,6 +158,8 @@ $reshook=$hookmanager->executeHooks('printFieldListWhere', $parameters, $object)
 $sql.=$hookmanager->resPrint;
 
 $formcore = new TFormCore($_SERVER['PHP_SELF'], 'form_list_match', 'GET');
+
+dol_include_once('match/tpl/player_filters.tpl.php');
 
 $nbLine = GETPOST('limit');
 if (empty($nbLine)) $nbLine = !empty($user->conf->MAIN_SIZE_LISTE_LIMIT) ? $user->conf->MAIN_SIZE_LISTE_LIMIT : $conf->global->MAIN_SIZE_LISTE_LIMIT;
@@ -150,7 +182,7 @@ $listViewConfig = array(
 		,'massactions'=>array(
 			'yourmassactioncode'  => $langs->trans('YourMassActionLabel')
 		)
-		,'param_url' => '&limit='.$nbLine
+		,'param_url' => '&limit=' . $nbLine . '&player_all=' . $player_all . '&winner_all=' . $player_win . '&looser_all=' . $player_loose
 	)
 	
 	,'subQuery' => array()

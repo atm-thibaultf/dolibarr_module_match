@@ -123,7 +123,7 @@ class Interfacematchtrigger
      * is inside directory core/triggers
      *
      * 	@param		string		$action		Event action code
-     * 	@param		Object		$object		Object
+     * 	@param		Object		$object		Object qui subit l'action
      * 	@param		User		$user		Object user
      * 	@param		Translate	$langs		Object langs
      * 	@param		conf		$conf		Object conf
@@ -153,6 +153,21 @@ class Interfacematchtrigger
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
         } elseif ($action == 'USER_MODIFY') {
+            //Empecher un user de modifier ses propres stats
+            //dol_include_once('core/lib/functions.lib.php');
+            $test_card = preg_match('/user\/card\.php/', $_SERVER['PHP_SELF']);
+
+            if (!empty($test_card) && ($object->array_options['options_nb_match'] != $object->oldcopy->array_options['options_nb_match'] || $object->array_options['options_nb_win'] != $object->oldcopy->array_options['options_nb_win'] || $object->array_options['options_nb_loose'] != $object->oldcopy->array_options['options_nb_loose'] || $object->array_options['options_nb_goal'] != $object->oldcopy->array_options['options_nb_goal']))
+            {
+                setEventMessage('Petit malin', 'warnings');
+                $object->array_options['options_nb_match'] = $object->oldcopy->array_options['options_nb_match'];
+                $object->array_options['options_nb_win'] = $object->oldcopy->array_options['options_nb_win'];
+                $object->array_options['options_nb_loose'] = $object->oldcopy->array_options['options_nb_loose'];
+                $object->array_options['options_nb_goal'] = $object->oldcopy->array_options['options_nb_goal'];
+                $object->array_options['options_ratio_win_loose'] = $object->oldcopy->array_options['options_ratio_win_loose'];
+                $object->update($user, 1);
+            }      
+
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
